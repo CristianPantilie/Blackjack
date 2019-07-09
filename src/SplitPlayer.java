@@ -15,11 +15,9 @@ public class SplitPlayer extends Player
         hand = new Hand(originalPlayer.hand.getCardIfEqual());
     }
 
-    @Override
-    protected void finalize() throws Throwable {
+    void yieldWinnings() {
         originalPlayer.setWealth(-amountLost);
         originalPlayer.setWealth(amountWon);
-        super.finalize();
     }
 
     void payBet(){
