@@ -1,6 +1,7 @@
 public class Dealer extends Player
 {
     private final int DEALER_WEALTH = 10000;
+    private int wealth;
     Dealer()
     {
         super("Dealer");
@@ -28,11 +29,5 @@ public class Dealer extends Player
         this.wealth -= 2 * p.getCurrentBet();
         p.giveBackBet();
     }
-
-
-//    void giveHand(Card c1, Card c2){
-//        super.hand = new Hand(c1, c2);
-//    }
-
 
 }

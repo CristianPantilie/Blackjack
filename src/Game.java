@@ -17,12 +17,6 @@ public class Game
     }
 
 
-    void test(){
-        for(Player p : players){
-            System.out.println(p.wealth);
-        }
-    }
-
     void play()
     {
         round();
