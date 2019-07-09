@@ -15,7 +15,11 @@ public class Player
 
     @Override
     public String toString() {
-        return name + " (" + wealth + " points)";
+        return name + " (" + currentBet + " points bet)";
+    }
+
+    void printNameAndWealth(){
+        System.out.println(name + ": " + wealth + " points");
     }
 
     String getName(){

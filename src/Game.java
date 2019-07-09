@@ -19,8 +19,15 @@ public class Game
 
     void play()
     {
-        round();
-        //TODO:shuffle deck
+
+        while(true){
+            System.out.println("***************************");
+            for(Player p : players)
+                p.printNameAndWealth();
+            System.out.println("***************************");
+            round();
+            deck.shuffleDeck();
+        }
     }
 
     private String currentSituation(Collection<Player> players){
@@ -29,16 +36,6 @@ public class Game
             sb.append(p.toString()).append(": ").append(p.hand.toString()).append("\n");
         }
         return sb.toString();
-    }
-
-    private void checkBusted(Set<Player> players){
-
-        Iterator<Player> it = players.iterator();
-        while(it.hasNext()){
-            Player p = it.next();
-            if(p.hand.isBusted())
-                it.remove();
-        }
     }
 
     private boolean checkBlackJack(Collection<Player> players){
@@ -75,7 +72,7 @@ public class Game
             else
             {
                 System.out.println(player.getName() + " would you like to hit again?(Y/N)");
-                String option = Main.userInput();
+                String option = Main.userInput().toUpperCase();
                 if (option.equals("Y"))
                 {
                     System.out.println(player.getName() + " chose to hit again");
@@ -91,15 +88,11 @@ public class Game
         return true;
     }
 
-    private boolean split(Player p)
-    {
-
-        return false;
-    }
-
     private boolean doubleDown(Player p){
         p.bet(p.getCurrentBet());
         p.hand.doubleDown(deck.popCard());
+        System.out.println("His hand is now: " + p.hand.toString() +
+                            "and his bet is: " + p.getCurrentBet());
 
         return p.hand.isBusted();
 
@@ -140,8 +133,8 @@ public class Game
             while(it.hasNext())
             {
                 Player p = it.next();
-                System.out.println(p.toString() + ", what is your option? (HIT, SPLIT, STAND, DOUBLEDOWN");
-                Option op = Option.valueOf(Main.userInput());
+                System.out.println(p.toString() + ", what is your option? (HIT, SPLIT, STAND, DOUBLEDOWN)");
+                Option op = Option.valueOf(Main.userInput().toUpperCase());
                 System.out.print(p.getName() + " chose to ");
                 switch (op) {
                     case HIT:
@@ -246,11 +239,7 @@ public class Game
                 System.out.println(p.getName() + " loses. He loses his bet. ");
             }
         }
-
-
     }
-
-
 
 
 }

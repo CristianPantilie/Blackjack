@@ -66,7 +66,7 @@ public class Hand
             valueWithoutAce += c.getValue();
         }
 
-        for(int i = nrAces; i >0 ; i--){
+        for(int i = nrAces; i > 0 ; i--){
             if(valueWithoutAce + ACE_VALUE_11 >= BUST_THRESHOLD){
                 value = valueWithoutAce + ACE_VALUE_1;
             }
@@ -76,8 +76,6 @@ public class Hand
         }
 
     }
-
-
 
     void giveCard(Card c){ addCard(c);}
 
@@ -92,11 +90,11 @@ public class Hand
     }
 
     void stand(){
-        System.out.print("stand. ");
+        System.out.println("stand. ");
     }
 
     void doubleDown(Card c){
-        System.out.print("double down. ");
+        System.out.println("double down. ");
         addCard(c);
     }
 

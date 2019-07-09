@@ -21,7 +21,7 @@ public class Deck
         shuffleDeck();
     }
 
-    private void shuffleDeck(){
+    void shuffleDeck(){
         availableCards.clear();
         availableCards.addAll(cards);
         Collections.shuffle(availableCards);
