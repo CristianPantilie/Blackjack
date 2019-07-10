@@ -8,6 +8,11 @@ public class Dealer extends Player
         wealth = DEALER_WEALTH;
     }
 
+    void giveHand(Card c)
+    {
+        hand = new Hand(c);
+    }
+
     void giveCard(Card c){
         super.hand.giveCard(c);
     }

@@ -43,7 +43,12 @@ public class Player
         wealth += currentBet;
     }
 
-    void setWealth(int amount){
+    void finishRound(){
+
+        currentBet = 0;
+    }
+
+    void getSplitHandMoney(int amount){
         wealth += amount;
     }
 
@@ -51,10 +56,5 @@ public class Player
 
         hand = new Hand(c1, c2);
     }
-
-    void giveHand(Card c){
-        hand = new Hand(c);
-    }
-
 
 }

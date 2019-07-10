@@ -9,6 +9,7 @@ public class Game
     private Deck deck;
 
     enum Option {HIT, STAND, DOUBLEDOWN, SPLIT}
+    enum Result {LOST, TIED, WON}
 
     Game(Dealer dealer, Player... player){
         players.addAll(Arrays.asList(player));

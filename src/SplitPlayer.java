@@ -16,8 +16,8 @@ public class SplitPlayer extends Player
     }
 
     void yieldWinnings() {
-        originalPlayer.setWealth(-amountLost);
-        originalPlayer.setWealth(amountWon);
+        originalPlayer.getSplitHandMoney(-amountLost);
+        originalPlayer.getSplitHandMoney(amountWon);
     }
 
     void payBet(){
