@@ -7,7 +7,7 @@ public class SplitPlayer extends Player
 
     SplitPlayer(Player originalPlayer){
         super(originalPlayer.getName() + " (other hand)");
-        this.bet(originalPlayer.getCurrentBet());
+        this.originalPlayer = originalPlayer;
 
         amountLost = originalPlayer.getCurrentBet();
         amountWon = 0;
@@ -20,16 +20,7 @@ public class SplitPlayer extends Player
         originalPlayer.getSplitHandMoney(amountWon);
     }
 
-    void payBet(){
-        amountLost = 0;
-        amountWon += getCurrentBet();
+    void finishRound(int wonAmount){
+        amountWon = wonAmount;
     }
-
-    void giveBackBet(){
-        amountWon = 0;
-        amountLost = 0;
-    }
-
-
-
 }

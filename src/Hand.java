@@ -83,32 +83,13 @@ public class Hand
         return this.value;
     }
 
-
-    void hit(Card c){
-        System.out.print("hit. ");
-        addCard(c);
-    }
-
-    void stand(){
-        System.out.println("stand. ");
-    }
-
-    void doubleDown(Card c){
-        System.out.println("double down. ");
-        addCard(c);
-    }
-
     Card getCardIfEqual()
     {
         return this.cards.get(0);
     }
 
-    void split()
-    {
-        System.out.print("split. ");
+    void split() {
         cards.remove(1);
-
-
     }
 
     Boolean canSplit(){

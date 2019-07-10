@@ -22,30 +22,23 @@ public class Player
         System.out.println(name + ": " + wealth + " points");
     }
 
-    String getName(){
-        return name;
-    }
-
-    void bet(int sum){
-        currentBet += sum;
-        wealth -= sum;
-    }
-
     int getCurrentBet(){
         return currentBet;
     }
 
-    void payBet(){
-        wealth += 2 * currentBet;
+    String getName(){
+        return name;
     }
 
-    void giveBackBet(){
-        wealth += currentBet;
+    void bet(Dealer dealer, int sum){
+        currentBet += sum;
+        wealth -= sum;
+        dealer.takeMoney(sum);
     }
 
-    void finishRound(){
-
+    void finishRound(int wonAmount){
         currentBet = 0;
+        wealth += wonAmount;
     }
 
     void getSplitHandMoney(int amount){
@@ -53,7 +46,6 @@ public class Player
     }
 
     void giveHand(Card c1, Card c2) {
-
         hand = new Hand(c1, c2);
     }
 

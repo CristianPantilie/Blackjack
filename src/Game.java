@@ -63,7 +63,7 @@ public class Game
 
         while(again)
         {
-            hand.hit(deck.popCard());
+            hand.giveCard(deck.popCard());
             System.out.println("His hand is now: " + hand.toString());
             if(hand.isBusted())
             {
@@ -90,8 +90,9 @@ public class Game
     }
 
     private boolean doubleDown(Player p){
-        p.bet(p.getCurrentBet());
-        p.hand.doubleDown(deck.popCard());
+        p.bet(dealer, p.getCurrentBet());
+        p.hand.giveCard(deck.popCard());
+        System.out.println("Double down");
         System.out.println("His hand is now: " + p.hand.toString() +
                             "and his bet is: " + p.getCurrentBet());
 
@@ -102,24 +103,25 @@ public class Game
     private void split(Player p, ListIterator<Player> it)
     {
         if (p.hand.canSplit()) {
+            System.out.println("split. ");
             //take a card away from the current hand
             p.hand.split();
-            //make a new player and add him to the winners list
+            //make a new player with identical bet
             Player clone = new SplitPlayer(p);
+            clone.bet(dealer, p.getCurrentBet());
 
             //hit for each of them
-            p.hand.hit(deck.popCard());
-            clone.hand.hit(deck.popCard());
+            p.hand.giveCard(deck.popCard());
+            clone.hand.giveCard(deck.popCard());
 
             System.out.println(p.getName() + "split. His new hands are: ");
             System.out.println(p.hand.toString());
             System.out.println(clone.hand.toString());
 
-            //the clone gets added before the current element
+            //add the clone to the list and set the iterator back to ask the current player and his clone for options again
             it.add(clone);
-            it.previous(); //clone
-            it.previous(); //current element
-
+            it.previous();
+            it.previous();
 
         } else
             System.out.println("Can't split, cards aren't equal");
@@ -130,13 +132,11 @@ public class Game
         for(Player p : players){
             System.out.println(p.getName() + ": place your bet.");
             int bet = Integer.parseInt(Main.userInput());
-            p.bet(bet);
-            dealer.giveMoney(bet);
+            p.bet(dealer, bet);
         }
     }
 
-    private void giveCards(List<Player> players){
-        //initialy give two cards to each player
+    private void giveInitialCards(List<Player> players){
         for(Player p : players){
             p.giveHand(deck.popCard(), deck.popCard());
         }
@@ -159,26 +159,86 @@ public class Game
                 case HIT:
                     //if the player busts after the hit he is removed from the winners list
                     if (!hitOrStandLoop(p, p.hand)) {
+                        p.finishRound(0);
                         it.remove();
-                        dealer.takeMoney(p);
                     }
                     break;
                 case SPLIT:
                     split(p, it);
                     break;
                 case STAND:
-                    p.hand.stand();
+                    System.out.println("stand.");
                     break;
                 case DOUBLEDOWN:
-                    //TODO: check for busts here too
                     if(!doubleDown(p)){
+                        p.finishRound(0);
                         it.remove();
-                        dealer.takeMoney(p);
                     }
                     break;
                 default:
                     System.out.println("Please select a valid option.");
                     break;
+            }
+        }
+    }
+
+    private boolean dealerHasBlackJack(List<Player> players, boolean playerHasBlackJack){
+        if(dealer.hand.isBlackJack())
+        {
+            System.out.println("Dealer blackjacked!");
+            if(playerHasBlackJack){
+                System.out.print("Tie with: ");
+                for(Player p : players) {
+                    System.out.print(p.getName() + " ");
+                }
+            }
+            else{
+                System.out.println("There are no other blackjacks. Dealer wins.");
+            }
+
+            return true;
+        }
+        return false;
+    }
+
+    private boolean dealerCompleteDrawing(List<Player> players){
+        while(dealer.hand.getValue() < DEALER_STAND_THRESHOLD)
+        {
+            System.out.println("Dealer hits.");
+            dealer.hand.giveCard(deck.popCard());
+            System.out.println("Dealer's hand is: " + dealer.hand.toString());
+            if(dealer.hand.isBusted())
+            {
+                System.out.print("Dealer busted! ");
+                for(Player p : players){
+                    System.out.print(p.getName() + " ");
+                    dealer.lostTo(p);
+                }
+                System.out.println("win.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void calculateWinners(List<Player> players){
+        int dealerValue = dealer.hand.getValue();
+        for(Player p : players)
+        {
+            if(p.hand.getValue() > dealerValue){
+                System.out.println(p.getName() + " wins. He receives " + p.getCurrentBet() + ". ");
+                dealer.lostTo(p);
+            }
+            else if(p.hand.getValue() == dealerValue){
+                System.out.println(p.getName() + " is at a tie with the dealer. His bet is given back.");
+                dealer.tiedWith(p);
+            }
+            else{
+                System.out.println(p.getName() + " loses. He loses his bet. ");
+            }
+
+            if(p instanceof SplitPlayer){
+                ((SplitPlayer) p).yieldWinnings();
             }
         }
     }
@@ -190,75 +250,31 @@ public class Game
 
         takeBets(winners);
 
-        giveCards(winners);
+        giveInitialCards(winners);
 
         System.out.println("Dealer: " + dealer.hand.toString());
         System.out.println(currentSituation(players));
 
-        boolean foundBlackJack = checkBlackJack(winners);
-        if(!foundBlackJack){    //check for options only if there are no blackjacks
+        boolean playerHasBlackJack = checkBlackJack(winners);
+
+        if(!playerHasBlackJack){
             getPlayerOptions(winners);
         }
 
-        //give another hand to the dealer
+
         dealer.giveCard(deck.popCard());
         System.out.println("Dealer's hand is: " + dealer.hand.toString());
 
-        //check for blackjack for dealer
-        if(dealer.hand.isBlackJack())
-        {
-            System.out.println("Dealer blackjacked!");
-            if(foundBlackJack){
-                System.out.print("Tie with: ");
-                for(Player p : winners)
-                    System.out.print(p.getName() + " ");
-            }
-            else{
-                System.out.println("There are no other blackjacks. Dealer wins.");
-            }
 
+        if(dealerHasBlackJack(winners, playerHasBlackJack))
             return; //round finished
-        }
 
-        //complete the drawing for the dealer
-        while(dealer.hand.getValue() < DEALER_STAND_THRESHOLD)
-        {
-            System.out.println("Dealer hits.");
-            dealer.hand.hit(deck.popCard());
-            System.out.println("Dealer's hand is: " + dealer.hand.toString());
-            if(dealer.hand.isBusted())
-            {
-                System.out.print("Dealer busted! ");
-                for(Player p : winners){
-                    System.out.print(p.getName() + " ");
-                    dealer.payBet(p);
-                }
-                System.out.println("win.");
-                return; //round finished
-            }
-        }
 
-        //finally, see who the winner is
-        int dealerValue = dealer.hand.getValue();
-        for(Player p : winners)
-        {
-            //TODO: nu afiseaza bine betul
-            if(p.hand.getValue() > dealerValue){
-                dealer.payBet(p);
-                System.out.println(p.getName() + " wins. He receives " + p.getCurrentBet() + ". ");
-            }
-            else if(p.hand.getValue() == dealerValue){
-                dealer.giveBackBet(p);
-                System.out.println(p.getName() + " is at a tie with the dealer. His bet is given back.");
-            }
-            else{
-                System.out.println(p.getName() + " loses. He loses his bet. ");
-            }
+        if(dealerCompleteDrawing(winners))  //dealer draws his cards
+            return; //if dealer has busted, round finishes
 
-            if(p instanceof SplitPlayer){
-                ((SplitPlayer) p).yieldWinnings();
-            }
-        }
+
+        calculateWinners(winners);
     }
 
 
