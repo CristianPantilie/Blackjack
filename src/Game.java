@@ -9,7 +9,6 @@ public class Game
     private Deck deck;
 
     enum Option {HIT, STAND, DOUBLEDOWN, SPLIT}
-    enum Result {LOST, TIED, WON}
 
     Game(Dealer dealer, Player... player){
         players.addAll(Arrays.asList(player));
@@ -245,20 +244,20 @@ public class Game
 
     private void round()
     {
-        //initially all players are winners
-        List<Player> winners = new ArrayList<>(this.players);
 
-        takeBets(winners);
+        List<Player> remainingPlayers = new ArrayList<>(this.players);
 
-        giveInitialCards(winners);
+        takeBets(remainingPlayers);
+
+        giveInitialCards(remainingPlayers);
 
         System.out.println("Dealer: " + dealer.hand.toString());
         System.out.println(currentSituation(players));
 
-        boolean playerHasBlackJack = checkBlackJack(winners);
+        boolean playerHasBlackJack = checkBlackJack(remainingPlayers);
 
         if(!playerHasBlackJack){
-            getPlayerOptions(winners);
+            getPlayerOptions(remainingPlayers);
         }
 
 
@@ -266,15 +265,15 @@ public class Game
         System.out.println("Dealer's hand is: " + dealer.hand.toString());
 
 
-        if(dealerHasBlackJack(winners, playerHasBlackJack))
+        if(dealerHasBlackJack(remainingPlayers, playerHasBlackJack))
             return; //round finished
 
 
-        if(dealerCompleteDrawing(winners))  //dealer draws his cards
+        if(dealerCompleteDrawing(remainingPlayers))  //dealer draws his cards
             return; //if dealer has busted, round finishes
 
 
-        calculateWinners(winners);
+        calculateWinners(remainingPlayers);
     }
 
 

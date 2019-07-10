@@ -22,8 +22,6 @@ public class Hand
         addCard(c);
     }
 
-    Hand() {}
-
     private void addCard(Card c){
         cards.add(c);
         if(c.isAce())
